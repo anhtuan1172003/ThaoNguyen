@@ -20,6 +20,36 @@ const getOrdersByEmployee = async (req, res) => {
     res.status(500).json({ error: 'Không thể tải danh sách đơn hàng' });
   }
 }
+
+// Lấy chi tiết đơn hàng theo ID
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate('inChargeId', 'name');
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
+    }
+
+    // Kiểm tra xác thực và quyền truy cập
+    const isAuthenticated = req.headers.authorization && req.store && 
+                          order.store.toString() === req.store._id.toString();
+    
+    // Nếu không xác thực hoặc không có quyền, chỉ trả về thông tin cơ bản
+    if (!isAuthenticated) {
+      return res.json({
+        name: order.name,
+        orderStatus: order.orderStatus
+      });
+    }
+
+    // Nếu có quyền, trả về toàn bộ thông tin
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ error: 'Không thể tải thông tin đơn hàng' });
+  }
+};
+
 // Tạo đơn hàng mới
 const createOrder = async (req, res) => {
   try {
@@ -155,9 +185,9 @@ const createOrderByAdmin = async (req, res) => {
 
 module.exports = {
   getOrders,
+  getOrderById,
   createOrderByAdmin,
   createOrderByEmployee,
-  createOrder,
   updateOrder,
   getOrdersByEmployee
 };

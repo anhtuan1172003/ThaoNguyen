@@ -16,6 +16,7 @@ import AdminOrders from './pages/admin/OrdersAdmin';
 import EmployeeOrders from './pages/employee/OrdersEmployee';
 import OrdersAdmin from './pages/admin/OrdersAdmin';
 import OrdersEmployee from './pages/employee/OrdersEmployee';
+import OrderDetail from './pages/OrderDetail';
 
 // Protected Route Components
 const AdminRoute = ({ children }) => {
@@ -45,6 +46,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/order/:id" element={<OrderDetail />} />
           <Route path="/dashboard" element={
             <RoleBasedRoute>
               {localStorage.getItem('loginType') === 'admin' ? <AdminDashboard /> : <EmployeeDashboard />}

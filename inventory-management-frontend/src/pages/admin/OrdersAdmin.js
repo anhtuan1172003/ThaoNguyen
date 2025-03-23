@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Form, Modal } from 'react-bootstrap';
+import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config';
 
@@ -7,7 +8,9 @@ const OrdersAdmin = () => {
   const [orders, setOrders] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showOrderDetailModal, setShowOrderDetailModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [newOrder, setNewOrder] = useState({
     name: '',
     customerPhone: '',
@@ -17,6 +20,7 @@ const OrdersAdmin = () => {
     price: '',
     inChargeId: ''
   });
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await axios.put(API_ENDPOINTS.ORDER(orderId),
@@ -34,6 +38,41 @@ const OrdersAdmin = () => {
     }
   };
 
+  const handleEditOrder = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `${API_ENDPOINTS.ORDERS}/${selectedOrder._id}`,
+        newOrder,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'licenseKey': localStorage.getItem('licenseKey')
+          }
+        }
+      );
+      setShowModal(false);
+      setIsEditing(false);
+      fetchOrders();
+    } catch (error) {
+      console.error('Error updating order:', error);
+    }
+  };
+
+  const handleEdit = (order) => {
+    setNewOrder({
+      name: order.name,
+      customerPhone: order.customerPhone,
+      machineType: order.machineType,
+      errorDescription: order.errorDescription,
+      initialStatus: order.initialStatus,
+      price: order.price,
+      inChargeId: order.inChargeId?._id || ''
+    });
+    setSelectedOrder(order);
+    setIsEditing(true);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -81,7 +120,7 @@ const OrdersAdmin = () => {
       };
       const token = localStorage.getItem('token');
       const licenseKey = localStorage.getItem('licenseKey');
-      await axios.post(API_ENDPOINTS.CREATE_ORDER_BY_ADMIN, submitData, {
+      const response = await axios.post(API_ENDPOINTS.CREATE_ORDER_BY_ADMIN, submitData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'licenseKey': licenseKey
@@ -97,10 +136,17 @@ const OrdersAdmin = () => {
         price: '',
         inChargeId: ''
       });
+      setSelectedOrder(response.data);
+      setShowOrderDetailModal(true);
       fetchOrders();
     } catch (error) {
       console.error('Error creating order:', error);
     }
+  };
+
+  const handleViewOrderDetail = (order) => {
+    setSelectedOrder(order);
+    setShowOrderDetailModal(true);
   };
 
   return (
@@ -117,10 +163,10 @@ const OrdersAdmin = () => {
           <tr>
             <th>STT</th>
             <th>Tên KH</th>
-            <th>Số điện thoại KH</th>
+
             <th>Loại máy</th>
             <th>Mô tả lỗi</th>
-            <th>Trạng thái ban đầu</th>
+
             <th>Giá</th>
             <th>Nhân viên phụ trách</th>
             <th>Trạng thái đơn</th>
@@ -131,36 +177,63 @@ const OrdersAdmin = () => {
           {orders.map((order, index) => (
             <tr key={order._id}>
               <td>{index + 1}</td>
-              <td><Button variant="link" onClick={() => setSelectedOrder(order)}>{order.name}</Button></td>
-              <td>{order.customerPhone}</td>
+              <td>
+                <Button
+                  variant="link"
+                  className="p-0 text-decoration-none text-primary"
+                  onClick={() => handleViewOrderDetail(order)}
+                >
+                  {order.name}
+                </Button>
+              </td>
+
               <td>{order.machineType}</td>
               <td>{order.errorDescription}</td>
-              <td>{order.initialStatus}</td>
+
               <td>{order.price}</td>
               <td>{order.inChargeId?.name || 'Chưa phân công'}</td>
               <td>
                 <Button
-                  variant={order.orderStatus === 'completed' ? 'secondary' : 'success'}
+                  variant={order.orderStatus === 'completed' ? 'success' : 'warning'}
                   size="sm"
                   onClick={() => handleStatusChange(order._id, order.orderStatus === 'completed' ? 'not completed' : 'completed')}
                 >
-                  {order.orderStatus === 'completed' ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}
+                  {order.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
                 </Button>
               </td>
               <td>
-
+                <Button
+                  variant="info"
+                  size="sm"
+                  onClick={() => handleEdit(order)}
+                >
+                  Sửa
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      {/* Modal tạo/sửa đơn hàng */}
+      <Modal show={showModal} onHide={() => {
+        setShowModal(false);
+        setIsEditing(false);
+        setNewOrder({
+          name: '',
+          customerPhone: '',
+          machineType: '',
+          errorDescription: '',
+          initialStatus: '',
+          price: '',
+          inChargeId: ''
+        });
+      }}>
         <Modal.Header closeButton>
-          <Modal.Title>Tạo đơn hàng mới</Modal.Title>
+          <Modal.Title>{isEditing ? 'Sửa đơn hàng' : 'Tạo đơn hàng mới'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleCreateOrder}>
+          <Form onSubmit={isEditing ? handleEditOrder : handleCreateOrder}>
             <Form.Group className="mb-3">
               <Form.Label>Tên khách hàng</Form.Label>
               <Form.Control
@@ -171,7 +244,7 @@ const OrdersAdmin = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Số điện thoại khách hàng</Form.Label>
+              <Form.Label>Số điện thoại</Form.Label>
               <Form.Control
                 type="text"
                 value={newOrder.customerPhone}
@@ -192,13 +265,14 @@ const OrdersAdmin = () => {
               <Form.Label>Mô tả lỗi</Form.Label>
               <Form.Control
                 as="textarea"
+                rows={3}
                 value={newOrder.errorDescription}
                 onChange={(e) => setNewOrder({ ...newOrder, errorDescription: e.target.value })}
                 required
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Trạng thái</Form.Label>
+              <Form.Label>Trạng thái ban đầu</Form.Label>
               <Form.Control
                 type="text"
                 value={newOrder.initialStatus}
@@ -220,64 +294,73 @@ const OrdersAdmin = () => {
               <Form.Select
                 value={newOrder.inChargeId}
                 onChange={(e) => setNewOrder({ ...newOrder, inChargeId: e.target.value })}
+                required
               >
                 <option value="">Chọn nhân viên</option>
                 {employees.map(employee => (
-                  <option key={employee._id} value={employee._id}>{employee.name}</option>
+                  <option key={employee._id} value={employee._id}>
+                    {employee.name}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
             <Button variant="primary" type="submit">
-              Tạo đơn hàng
+              {isEditing ? 'Lưu thay đổi' : 'Tạo đơn hàng'}
             </Button>
           </Form>
         </Modal.Body>
       </Modal>
 
-      <Modal show={selectedOrder} onHide={() => setSelectedOrder(null)} size="lg">
+      {/* Modal chi tiết đơn hàng với QR Code */}
+      <Modal show={showOrderDetailModal} onHide={() => setShowOrderDetailModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Chi tiết đơn hàng</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedOrder && (
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Tên khách hàng</Form.Label>
-                <Form.Control plaintext readOnly value={selectedOrder.name} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Số điện thoại</Form.Label>
-                <Form.Control plaintext readOnly value={selectedOrder.customerPhone} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Loại máy</Form.Label>
-                <Form.Control plaintext readOnly value={selectedOrder.machineType} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Mô tả lỗi</Form.Label>
-                <Form.Control plaintext readOnly value={selectedOrder.errorDescription} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Ngày tạo</Form.Label>
-                <Form.Control
-                  plaintext
-                  readOnly
-                  value={new Date(selectedOrder.createdAt).toLocaleDateString()}
+            <div>
+              <div className="mb-4">
+                <h5 className="mb-3">Thông tin khách hàng</h5>
+                <p><strong>Tên khách hàng:</strong> {selectedOrder.name}</p>
+                <p><strong>Số điện thoại:</strong> {selectedOrder.customerPhone}</p>
+              </div>
+
+              <div className="mb-4">
+                <h5 className="mb-3">Thông tin thiết bị</h5>
+                <p><strong>Loại máy:</strong> {selectedOrder.machineType}</p>
+                <p><strong>Tình trạng ban đầu:</strong> {selectedOrder.initialStatus}</p>
+                <p><strong>Mô tả lỗi:</strong> {selectedOrder.errorDescription}</p>
+              </div>
+
+              <div className="mb-4">
+                <h5 className="mb-3">Thông tin sửa chữa</h5>
+                <p><strong>Giá:</strong> {selectedOrder.price}</p>
+                <p>
+                  <strong>Trạng thái:</strong>{' '}
+                  <span className={`badge bg-${selectedOrder.orderStatus === 'completed' ? 'success' : 'warning'}`}>
+                    {selectedOrder.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
+                  </span>
+                </p>
+              </div>
+
+              <div className="text-center mt-4">
+                <p><strong>Mã QR đơn hàng</strong></p>
+                <QRCodeSVG
+                  value={`${window.location.origin}/order/${selectedOrder._id}`}
+                  size={200}
+                  level="H"
+                  className="mx-auto d-block"
                 />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Ghi chú</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  plaintext
-                  readOnly
-                  value={selectedOrder.notes || 'Không có ghi chú'}
-                  style={{ height: '100px' }}
-                />
-              </Form.Group>
-            </Form>
+                <p className="text-muted mt-2">Quét mã QR để xem chi tiết đơn hàng</p>
+              </div>
+            </div>
           )}
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowOrderDetailModal(false)}>
+            Đóng
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

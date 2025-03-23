@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
-import { Package, ShoppingCart } from 'lucide-react';
+import { Row, Col, Card, Button } from 'react-bootstrap';
+import { Package, ShoppingCart, QrCode } from 'lucide-react';
+import QRScanner from '../../components/QRScanner';
 import axios from 'axios';
 
 const EmployeeDashboard = () => {
@@ -8,6 +9,7 @@ const EmployeeDashboard = () => {
     products: 0,
     orders: 0
   });
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -46,7 +48,17 @@ const EmployeeDashboard = () => {
 
   return (
     <div>
-      <h2 className="mb-4">Employee Dashboard</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>Bảng điều khiển</h2>
+        <Button 
+          variant="primary" 
+          onClick={() => setShowScanner(true)}
+          className="d-flex align-items-center gap-2"
+        >
+          <QrCode size={20} />
+          Quét QR đơn hàng
+        </Button>
+      </div>
       <Row>
         <Col md={6}>
           <Card className="mb-3">
@@ -79,6 +91,10 @@ const EmployeeDashboard = () => {
           </Card>
         </Col>
       </Row>
+      <QRScanner 
+        show={showScanner} 
+        onHide={() => setShowScanner(false)} 
+      />
     </div>
   );
 };
