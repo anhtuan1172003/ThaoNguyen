@@ -48,7 +48,6 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error('Error fetching stats:', error);
       }
-      window.location.reload();
     };
 
     fetchStats();
