@@ -27,7 +27,7 @@ const AdminNavigation = () => {
             <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
             <Nav.Link as={Link} to="/products">Sản phẩm</Nav.Link>
             <Nav.Link as={Link} to="/employees">Nhân viên</Nav.Link>
-            <Nav.Link as={Link} to="/orders">Đơn hàng</Nav.Link>
+            <Nav.Link as={Link} to="/Aorders">Đơn hàng</Nav.Link>
           </Nav>
           <Button variant="outline-light" onClick={handleLogout}>
             Đăng xuất

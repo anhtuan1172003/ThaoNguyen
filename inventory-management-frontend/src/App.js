@@ -62,9 +62,19 @@ function App() {
               </AdminLayout>
             </AdminRoute>
           } />
-          <Route path="/orders" element={
+          {/* <Route path="/orders" element={
             <RoleBasedRoute>
               {localStorage.getItem('loginType') === 'admin' ? <OrdersAdmin/> : <OrdersEmployee/>}
+            </RoleBasedRoute>
+          } /> */}
+          <Route path="/orders" element={
+            <RoleBasedRoute>
+              <OrdersEmployee/>
+            </RoleBasedRoute>
+          } />
+          <Route path="/Aorders" element={
+            <RoleBasedRoute>
+              <OrdersAdmin/>
             </RoleBasedRoute>
           } />
           <Route path="/" element={<Navigate to="/login" replace />} />

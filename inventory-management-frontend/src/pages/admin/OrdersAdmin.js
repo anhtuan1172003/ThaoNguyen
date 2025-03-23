@@ -5,6 +5,18 @@ import { API_ENDPOINTS } from '../../config';
 
 const OrdersAdmin = () => {
   const [orders, setOrders] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [newOrder, setNewOrder] = useState({
+    name: '',
+    customerPhone: '',
+    machineType: '',
+    errorDescription: '',
+    initialStatus: '',
+    price: '',
+    inChargeId: ''
+  });
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await axios.put(API_ENDPOINTS.ORDER(orderId),
@@ -21,18 +33,7 @@ const OrdersAdmin = () => {
       console.error('Error updating order status:', error);
     }
   };
-  const [employees, setEmployees] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [newOrder, setNewOrder] = useState({
-    name: '',
-    customerPhone: '',
-    machineType: '',
-    errorDescription: '',
-    initialStatus: '',
-    price: '',
-    inChargeId: ''
-  });
+
 
   useEffect(() => {
     fetchOrders();
@@ -41,10 +42,12 @@ const OrdersAdmin = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.ORDERS, {
+      const token = localStorage.getItem('token');
+      const licenseKey = localStorage.getItem('licenseKey');
+      const response = await axios.get(`${API_ENDPOINTS.ORDERS}?ts=${Date.now()}`, {
         headers: {
-          'licenseKey': localStorage.getItem('licenseKey'),
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
+          'licenseKey': licenseKey
         }
       });
       setOrders(response.data);
@@ -76,11 +79,12 @@ const OrdersAdmin = () => {
         ...newOrder,
         inChargeId: newOrder.inChargeId || null
       };
-
+      const token = localStorage.getItem('token');
+      const licenseKey = localStorage.getItem('licenseKey');
       await axios.post(API_ENDPOINTS.CREATE_ORDER_BY_ADMIN, submitData, {
         headers: {
-          'licenseKey': localStorage.getItem('licenseKey'),
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
+          'licenseKey': licenseKey
         }
       });
       setShowModal(false);
@@ -136,12 +140,12 @@ const OrdersAdmin = () => {
               <td>{order.inChargeId?.name || 'Chưa phân công'}</td>
               <td>
                 <Button
-                variant={order.orderStatus === 'completed' ? 'secondary' : 'success'}
-                size="sm"
-                onClick={() => handleStatusChange(order._id, order.orderStatus === 'completed' ? 'not completed' : 'completed')}
-              >
-                {order.orderStatus === 'completed' ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}
-              </Button>
+                  variant={order.orderStatus === 'completed' ? 'secondary' : 'success'}
+                  size="sm"
+                  onClick={() => handleStatusChange(order._id, order.orderStatus === 'completed' ? 'not completed' : 'completed')}
+                >
+                  {order.orderStatus === 'completed' ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}
+                </Button>
               </td>
               <td>
 

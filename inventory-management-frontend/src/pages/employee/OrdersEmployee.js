@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../../config';
 
 const OrdersEmployee = () => {
     const [orders, setOrders] = useState([]);
+    
     const [showModal, setShowModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [newOrder, setNewOrder] = useState({
@@ -16,9 +17,6 @@ const OrdersEmployee = () => {
         price: ''
     });
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
     const handleStatusChange = async (orderId, newStatus) => {
         try {
             await axios.put(API_ENDPOINTS.ORDER(orderId),
@@ -35,11 +33,15 @@ const OrdersEmployee = () => {
             console.error('Error updating order status:', error);
         }
     };
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+    
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
             const licenseKey = localStorage.getItem('licenseKey');
-            const response = await axios.get(API_ENDPOINTS.ORDERS_BY_EMPLOYEE, {
+            const response = await axios.get(`${API_ENDPOINTS.ORDERS_BY_EMPLOYEE}?ts=${Date.now()}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'licenseKey': licenseKey
