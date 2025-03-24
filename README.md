@@ -56,6 +56,17 @@ This is a **Full-Stack MERN** (MongoDB, Express, React, Node.js) project designe
    cd inventory-management-frontend
    npm start
    ```
+   
+## 🛠️ Test Accounts
+- **Admin Account:**
+  - Email: `admin2@example.com`
+  - Password: `hashed_password_2`
+
+- **Employee Account:**
+  - Username: `tuan@gmail.com`
+  - Password: `123`
+
+🔗 **Live Demo**: [Demo Here](https://computer-repair-store.netlify.app/)
 
 ## 📜 License
 This project is licensed under a **store-based licensing system**. Each store must obtain a valid **license key** to use the system.
