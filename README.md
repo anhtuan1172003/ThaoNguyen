@@ -65,9 +65,9 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## 📞 Contact
 For inquiries, feel free to reach out:
-- **Email**: your-email@example.com
-- **Facebook**: [Your Profile](https://www.facebook.com/trananhtuan1173)
-- **GitHub**: [Your GitHub](https://github.com/anhtuan1172003)
+- **Email**: trantuan1172003@gmail.com
+- **Facebook**: [My Profile](https://www.facebook.com/trananhtuan1173)
+- **GitHub**: [My GitHub](https://github.com/anhtuan1172003)
 
 ---
 ⭐ If you like this project, don’t forget to **star** the repo!
