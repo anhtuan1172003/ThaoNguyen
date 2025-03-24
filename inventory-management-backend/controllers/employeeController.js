@@ -40,7 +40,8 @@ const addEmployee = async (req, res) => {
       username,
       password: hashedPassword,
       role,
-      store: storeId
+      store: storeId,
+      isActive: true
     });
 
     await newEmployee.save();

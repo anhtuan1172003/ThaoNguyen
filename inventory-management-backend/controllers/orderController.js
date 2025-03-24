@@ -3,46 +3,36 @@ const Employee = require('../models/Employee');
 
 // Lấy danh sách đơn hàng theo cửa hàng
 const getOrders = (req, res) => {
-  Order.find({ store: req.store._id }).populate('inChargeId', 'name')
+  Order.find({ store: req.store._id })
+    .populate('inChargeId', 'name')
+    .sort({ createdAt: -1 })
     .then(orders => res.json(orders))
     .catch(err => res.status(500).json({ error: err.message }));
 };
 
-
+// Lấy danh sách đơn hàng theo nhân viên
 const getOrdersByEmployee = async (req, res) => {
   try {
-    Order.find({ inChargeId: req.employeeId })
-
-      .then(orders => res.json(orders))
-      .catch(err => res.status(500).json({ error: err.message }));
+    const orders = await Order.find({ inChargeId: req.employeeId })
+      .populate('inChargeId', 'name')
+      .sort({ createdAt: -1 });
+    res.json(orders);
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Không thể tải danh sách đơn hàng' });
   }
-}
+};
 
 // Lấy chi tiết đơn hàng theo ID
 const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('inChargeId', 'name');
+    const order = await Order.findById(req.params.id)
+      .populate('inChargeId', 'name');
     
     if (!order) {
       return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
     }
 
-    // Kiểm tra xác thực và quyền truy cập
-    const isAuthenticated = req.headers.authorization && req.store && 
-                          order.store.toString() === req.store._id.toString();
-    
-    // Nếu không xác thực hoặc không có quyền, chỉ trả về thông tin cơ bản
-    if (!isAuthenticated) {
-      return res.json({
-        name: order.name,
-        orderStatus: order.orderStatus
-      });
-    }
-
-    // Nếu có quyền, trả về toàn bộ thông tin
     res.json(order);
   } catch (error) {
     console.error('Error fetching order:', error);
@@ -50,144 +40,85 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// Tạo đơn hàng mới
-const createOrder = async (req, res) => {
-  try {
-    const { name, customerPhone, machineType, errorDescription, initialStatus, price, inChargeId } = req.body;
-
-    // Xác định inCharge dựa vào role của người tạo đơn
-    let employeeInCharge;
-    if (req.loginType === 'admin') {
-      // Admin chọn employee từ danh sách
-      if (!inChargeId) {
-        return res.status(400).json({ error: 'Vui lòng chọn nhân viên phụ trách đơn hàng' });
-      }
-      employeeInCharge = inChargeId;
-    } else {
-      // Employee tự động được gán là người phụ trách
-      employeeInCharge = req.employeeId;
-    }
-
-    const newOrder = new Order({
-      name,
-      customerPhone,
-      machineType,
-      errorDescription,
-      initialStatus,
-      price,
-      store: req.storeId,
-      inChargeId: employeeInCharge
-    });
-
-    const savedOrder = await newOrder.save();
-
-    // Thêm order vào danh sách công việc của nhân viên phụ trách
-    await Employee.findOneAndUpdate(
-      { _id: employeeInCharge },
-      { $push: { tasks: savedOrder._id } }
-    );
-
-    res.json(savedOrder);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Cập nhật đơn hàng
-const updateOrder = async (req, res) => {
-  try {
-    const updatedOrder = await Order.findOneAndUpdate(
-      { _id: req.params.id, store: req.storeId, createdBy: req.employeeId },
-      req.body,
-      { new: true }
-    );
-
-    if (!updatedOrder) {
-      return res.status(403).json({ error: 'Bạn không có quyền cập nhật đơn hàng này' });
-    }
-
-    res.json(updatedOrder);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
+// Tạo đơn hàng mới bởi nhân viên
 const createOrderByEmployee = async (req, res) => {
   try {
-    const { name, customerPhone, machineType, errorDescription, initialStatus, price } = req.body;
-
     const newOrder = new Order({
-      name,
-      customerPhone,
-      machineType,
-      errorDescription,
-      initialStatus,
-      price,
-      store: req.storeId,
-      inChargeId: req.employeeId // Tự động gán cho nhân viên đang đăng nhập
+      ...req.body,
+      store: req.store._id,
+      inChargeId: req.employeeId,
+      createdAt: new Date()
     });
 
     const savedOrder = await newOrder.save();
-    await Employee.findOneAndUpdate(
-      { _id: req.employeeId },
-      { $push: { tasks: savedOrder._id } }
-    );
-    res.json(savedOrder);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ error: 'Không thể tạo đơn hàng' });
   }
 };
 
+// Tạo đơn hàng mới bởi admin
 const createOrderByAdmin = async (req, res) => {
   try {
-    const { name, customerPhone, machineType, errorDescription, initialStatus, price, inChargeId } = req.body;
-
-    if (!inChargeId) {
-      return res.status(400).json({ error: 'Vui lòng chọn nhân viên phụ trách' });
-    }
-
-    console.log('Request body:', req.body);
-    console.log('inChargeId from request:', inChargeId);
-    console.log('StoreId from token:', req.storeId);
-
-    // Kiểm tra nhân viên có thuộc cửa hàng quản lý bởi admin
-    const employee = await Employee.findOne({ 
-      _id: inChargeId,
-      store: req.storeId
-    });
-    console.log('Employee check result:', employee);
-
-    if (!employee) {
-      return res.status(400).json({ error: 'Nhân viên không tồn tại hoặc không thuộc cửa hàng này' });
+    // Kiểm tra nhân viên có thuộc cửa hàng không
+    const employee = await Employee.findById(req.body.inChargeId);
+    if (!employee || employee.store.toString() !== req.store._id.toString()) {
+      return res.status(400).json({ error: 'Nhân viên không hợp lệ' });
     }
 
     const newOrder = new Order({
-      name,
-      customerPhone,
-      machineType,
-      errorDescription,
-      initialStatus,
-      price,
-      store: req.storeId,
-      inChargeId
+      ...req.body,
+      store: req.store._id,
+      createdAt: new Date()
     });
 
     const savedOrder = await newOrder.save();
-    await Employee.findOneAndUpdate(
-      { _id: inChargeId },
-      { $push: { tasks: savedOrder._id } }
-    );
-    res.json(savedOrder);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ error: 'Không thể tạo đơn hàng' });
+  }
+};
+
+// Cập nhật trạng thái đơn hàng
+const updateOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
+    }
+
+    // Nếu đang cập nhật trạng thái
+    if (req.body.orderStatus) {
+      // Nếu đánh dấu hoàn thành và trước đó chưa hoàn thành
+      if (req.body.orderStatus === 'completed' && order.orderStatus !== 'completed') {
+        req.body.completedAt = new Date();
+      }
+      // Nếu đánh dấu chưa hoàn thành
+      else if (req.body.orderStatus === 'not completed') {
+        req.body.completedAt = null;
+      }
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    ).populate('inChargeId', 'name');
+
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ error: 'Không thể cập nhật đơn hàng' });
   }
 };
 
 module.exports = {
   getOrders,
+  getOrdersByEmployee,
   getOrderById,
-  createOrderByAdmin,
   createOrderByEmployee,
-  updateOrder,
-  getOrdersByEmployee
+  createOrderByAdmin,
+  updateOrder
 };

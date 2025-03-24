@@ -22,6 +22,6 @@ router.post('/', authenticateEmployee, orderController.createOrderByEmployee);
 router.get('/:id', orderController.getOrderById);
 
 // Cập nhật đơn hàng (yêu cầu xác thực nhân viên)
-router.put('/:id', authenticate, orderController.updateOrder);
+router.put('/:id', [authenticateEmployee, authenticate], orderController.updateOrder);
 
 module.exports = router;

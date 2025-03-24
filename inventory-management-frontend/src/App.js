@@ -17,6 +17,7 @@ import EmployeeOrders from './pages/employee/OrdersEmployee';
 import OrdersAdmin from './pages/admin/OrdersAdmin';
 import OrdersEmployee from './pages/employee/OrdersEmployee';
 import OrderDetail from './pages/OrderDetail';
+import EmployeeManagement from './pages/admin/EmployeeManagement';
 
 // Protected Route Components
 const AdminRoute = ({ children }) => {
@@ -60,7 +61,7 @@ function App() {
           <Route path="/employees" element={
             <AdminRoute>
               <AdminLayout>
-                <Employees />
+                <Employees/>
               </AdminLayout>
             </AdminRoute>
           } />

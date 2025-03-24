@@ -9,17 +9,44 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  machineType: String,
-  errorDescription: String,
-  initialStatus: String,
-  price: Number,
+  machineType: {
+    type: String,
+    required: true
+  },
+  errorDescription: {
+    type: String,
+    required: true
+  },
+  initialStatus: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
   orderStatus: {
     type: String,
-    enum: ['not completed', 'completed'],
+    enum: ['completed', 'not completed'],
     default: 'not completed'
   },
-  store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
-  inChargeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' }
+  inChargeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee'
+  },
+  store: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Store',
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  completedAt: {
+    type: Date,
+    default: null
+  }
 });
 
 module.exports = mongoose.model('Order', orderSchema);

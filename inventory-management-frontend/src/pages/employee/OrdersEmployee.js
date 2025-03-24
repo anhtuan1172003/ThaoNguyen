@@ -85,6 +85,25 @@ const OrdersEmployee = () => {
         }
     };
 
+    const handleViewOrderDetail = (order) => {
+        setSelectedOrder(order);
+        setShowOrderDetailModal(true);
+    };
+
+    const handleEdit = (order) => {
+        setNewOrder({
+            name: order.name,
+            customerPhone: order.customerPhone,
+            machineType: order.machineType,
+            errorDescription: order.errorDescription,
+            initialStatus: order.initialStatus,
+            price: order.price
+        });
+        setSelectedOrder(order);
+        setIsEditing(true);
+        setShowModal(true);
+    };
+
     const handleEditOrder = async (e) => {
         e.preventDefault();
         try {
@@ -106,25 +125,6 @@ const OrdersEmployee = () => {
         }
     };
 
-    const handleEdit = (order) => {
-        setNewOrder({
-            name: order.name,
-            customerPhone: order.customerPhone,
-            machineType: order.machineType,
-            errorDescription: order.errorDescription,
-            initialStatus: order.initialStatus,
-            price: order.price
-        });
-        setSelectedOrder(order);
-        setIsEditing(true);
-        setShowModal(true);
-    };
-
-    const handleViewOrderDetail = (order) => {
-        setSelectedOrder(order);
-        setShowOrderDetailModal(true);
-    };
-
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -139,12 +139,12 @@ const OrdersEmployee = () => {
                     <tr>
                         <th>STT</th>
                         <th>Tên KH</th>
-                        
                         <th>Loại máy</th>
                         <th>Mô tả lỗi</th>
-                        
                         <th>Giá</th>
                         <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Ngày hoàn thành</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -161,10 +161,8 @@ const OrdersEmployee = () => {
                                     {order.name}
                                 </Button>
                             </td>
-                            
                             <td>{order.machineType}</td>
                             <td>{order.errorDescription}</td>
-                            
                             <td>{order.price}</td>
                             <td>
                                 <Button
@@ -175,16 +173,23 @@ const OrdersEmployee = () => {
                                     {order.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
                                 </Button>
                             </td>
+                            <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                            <td>{order.completedAt ? new Date(order.completedAt).toLocaleDateString() : 'Chưa hoàn thành'}</td>
                             <td>
-                                
-                                    <Button
-                                        variant="info"
-                                        size="sm"
-                                        onClick={() => handleEdit(order)}
-                                    >
-                                        Sửa
-                                    </Button>
-                                
+                                <Button
+                                    variant="info"
+                                    size="sm"
+                                    onClick={() => handleViewOrderDetail(order)}
+                                >
+                                    Chi tiết
+                                </Button>
+                                <Button
+                                    variant="warning"
+                                    size="sm"
+                                    onClick={() => handleEdit(order)}
+                                >
+                                    Sửa
+                                </Button>
                             </td>
                         </tr>
                     ))}
@@ -301,6 +306,8 @@ const OrdersEmployee = () => {
                                         {selectedOrder.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
                                     </span>
                                 </p>
+                                <p><strong>Ngày tạo:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                                <p><strong>Ngày hoàn thành:</strong> {selectedOrder.completedAt ? new Date(selectedOrder.completedAt).toLocaleDateString() : 'Chưa hoàn thành'}</p>
                             </div>
 
                             <div className="text-center mt-4">
