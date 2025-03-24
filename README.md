@@ -31,11 +31,11 @@ This is a **Full-Stack MERN** (MongoDB, Express, React, Node.js) project designe
 2. **Install dependencies:**
    ```sh
    # Backend
-   cd inventory-management-backend
+   cd backend
    npm install
 
    # Frontend
-   cd inventory-management-frontend
+   cd frontend
    npm install
    ```
 
@@ -49,11 +49,11 @@ This is a **Full-Stack MERN** (MongoDB, Express, React, Node.js) project designe
 4. **Run the application:**
    ```sh
    # Start backend
-   cd inventory-management-backend
+   cd backend
    npm start
 
    # Start frontend
-   cd inventory-management-frontend
+   cd frontend
    npm start
    ```
    
