@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
       try {
         // Lấy số lượng sản phẩm
-        const productsResponse = await axios.get('http://localhost:3001/products', {
+        const productsResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/products', {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         });
         
         // Lấy số lượng nhân viên
-        const employeesResponse = await axios.get('http://localhost:3001/employees', {
+        const employeesResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/employees', {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
@@ -35,7 +35,7 @@ const AdminDashboard = () => {
         });
 
         // Lấy số lượng đơn hàng
-        const ordersResponse = await axios.get('http://localhost:3001/orders', {
+        const ordersResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/orders', {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
