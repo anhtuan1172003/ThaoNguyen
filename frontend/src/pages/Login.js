@@ -30,7 +30,7 @@ const Login = () => {
         ? { email: formData.email, password: formData.password }
         : { username: formData.username, password: formData.password };
 
-      const response = await axios.post(`http://localhost:3001${endpoint}`, payload);
+      const response = await axios.post(`https://thaonguyen-full-stack.onrender.com/${endpoint}`, payload);
       
       // Lưu thông tin đăng nhập
       localStorage.setItem('token', response.data.token);
