@@ -10,6 +10,19 @@ const OrderDetail = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Format thời gian để hiển thị
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "Chưa có";
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -26,7 +39,7 @@ const OrderDetail = () => {
           headers['licenseKey'] = licenseKey;
         }
 
-        const response = await axios.get(`${API_ENDPOINTS.ORDER(id)}`, { headers });
+        const response = await axios.get(`${API_ENDPOINTS.GET_ORDER_DETAIL(id)}`, { headers });
         setOrder(response.data);
       } catch (error) {
         setError(error.response?.data?.error || error.message);
@@ -96,6 +109,8 @@ const OrderDetail = () => {
                   <p><strong>Số điện thoại:</strong> {order.customerPhone}</p>
                   <p><strong>Giá:</strong> {order.price}</p>
                   <p><strong>Nhân viên phụ trách:</strong> {order.inChargeId?.name || 'Chưa phân công'}</p>
+                  <p><strong>Thời gian nhận:</strong> {formatDateTime(order.receiveTime)}</p>
+                  <p><strong>Thời gian hoàn thành:</strong> {formatDateTime(order.completedTime)}</p>
                 </div>
               </div>
             </>

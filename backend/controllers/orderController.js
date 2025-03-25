@@ -183,11 +183,46 @@ const createOrderByAdmin = async (req, res) => {
   }
 };
 
+// Cập nhật trạng thái đơn hàng
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderStatus } = req.body;
+    const orderId = req.params.id;
+    
+    // Tìm đơn hàng
+    const order = await Order.findOne({ 
+      _id: orderId, 
+      store: req.store._id 
+    });
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
+    }
+    
+    // Cập nhật trạng thái
+    order.orderStatus = orderStatus;
+    
+    // Cập nhật thời gian hoàn thành nếu đơn hàng được đánh dấu là hoàn thành
+    if (orderStatus === 'completed') {
+      order.completedTime = new Date();
+    } else {
+      // Nếu chuyển từ hoàn thành sang chưa hoàn thành, xóa thời gian hoàn thành
+      order.completedTime = null;
+    }
+    
+    await order.save();
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getOrders,
   getOrderById,
   createOrderByAdmin,
   createOrderByEmployee,
   updateOrder,
-  getOrdersByEmployee
+  getOrdersByEmployee,
+  updateOrderStatus
 };

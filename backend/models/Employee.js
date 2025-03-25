@@ -6,7 +6,8 @@ const employeeSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: String,
   store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
-  tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
+  tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
+  isActive: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);

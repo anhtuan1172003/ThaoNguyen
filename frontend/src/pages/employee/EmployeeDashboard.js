@@ -3,7 +3,7 @@ import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Package, ShoppingCart, QrCode } from 'lucide-react';
 import QRScanner from '../../components/QRScanner';
 import axios from 'axios';
-
+import { API_ENDPOINTS } from '../../config';
 const EmployeeDashboard = () => {
   const [stats, setStats] = useState({
     products: 0,
@@ -18,7 +18,7 @@ const EmployeeDashboard = () => {
 
       try {
         // Lấy số lượng sản phẩm
-        const productsResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/products', {
+        const productsResponse = await axios.get(`${API_ENDPOINTS.GET_EMPLOYEE_PRODUCTS}`, {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
@@ -26,7 +26,7 @@ const EmployeeDashboard = () => {
         });
 
         // Lấy số lượng đơn hàng
-        const ordersResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/orders', {
+        const ordersResponse = await axios.get(`${API_ENDPOINTS.GET_ORDERS_BY_EMPLOYEE}`, {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`

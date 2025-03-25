@@ -21,9 +21,22 @@ const OrdersAdmin = () => {
     inChargeId: ''
   });
 
+  // Format thời gian để hiển thị
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "Chưa có";
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await axios.put(API_ENDPOINTS.ORDER(orderId),
+      await axios.put(API_ENDPOINTS.EDIT_ORDER_STATUS_BY_ADMIN(orderId),
         { orderStatus: newStatus },
         {
           headers: {
@@ -42,7 +55,7 @@ const OrdersAdmin = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `${API_ENDPOINTS.ORDERS}/${selectedOrder._id}`,
+        `${API_ENDPOINTS.EDIT_ORDERS_BY_ADMIN}/${selectedOrder._id}`,
         newOrder,
         {
           headers: {
@@ -83,7 +96,7 @@ const OrdersAdmin = () => {
     try {
       const token = localStorage.getItem('token');
       const licenseKey = localStorage.getItem('licenseKey');
-      const response = await axios.get(`${API_ENDPOINTS.ORDERS}?ts=${Date.now()}`, {
+      const response = await axios.get(`${API_ENDPOINTS.GET_ORDERS_BY_ADMIN}?ts=${Date.now()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'licenseKey': licenseKey
@@ -99,7 +112,7 @@ const OrdersAdmin = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.EMPLOYEES, {
+      const response = await axios.get(API_ENDPOINTS.GET_EMPLOYEES_BY_ADMIN, {
         headers: {
           'licenseKey': localStorage.getItem('licenseKey'),
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -136,7 +149,14 @@ const OrdersAdmin = () => {
         price: '',
         inChargeId: ''
       });
-      setSelectedOrder(response.data);
+      
+      // Đảm bảo dữ liệu đơn hàng có thông tin thời gian
+      const orderData = {
+        ...response.data,
+        receiveTime: response.data.receiveTime || new Date().toISOString()
+      };
+      
+      setSelectedOrder(orderData);
       setShowOrderDetailModal(true);
       fetchOrders();
     } catch (error) {
@@ -163,13 +183,13 @@ const OrdersAdmin = () => {
           <tr>
             <th>STT</th>
             <th>Tên KH</th>
-
             <th>Loại máy</th>
             <th>Mô tả lỗi</th>
-
             <th>Giá</th>
             <th>Nhân viên phụ trách</th>
-            <th>Trạng thái đơn</th>
+            <th>Trạng thái</th>
+            <th>Thời gian nhận</th>
+            <th>Thời gian hoàn thành</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -186,10 +206,8 @@ const OrdersAdmin = () => {
                   {order.name}
                 </Button>
               </td>
-
               <td>{order.machineType}</td>
               <td>{order.errorDescription}</td>
-
               <td>{order.price}</td>
               <td>{order.inChargeId?.name || 'Chưa phân công'}</td>
               <td>
@@ -201,6 +219,8 @@ const OrdersAdmin = () => {
                   {order.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
                 </Button>
               </td>
+              <td>{formatDateTime(order.receiveTime || '')}</td>
+              <td>{formatDateTime(order.completedTime || '')}</td>
               <td>
                 <Button
                   variant="info"
@@ -341,6 +361,9 @@ const OrdersAdmin = () => {
                     {selectedOrder.orderStatus === 'completed' ? 'Hoàn thành' : 'Chưa hoàn thành'}
                   </span>
                 </p>
+                <p><strong>Nhân viên phụ trách:</strong> {selectedOrder.inChargeId?.name || 'Chưa phân công'}</p>
+                <p><strong>Thời gian nhận:</strong> {formatDateTime(selectedOrder.receiveTime || '')}</p>
+                <p><strong>Thời gian hoàn thành:</strong> {formatDateTime(selectedOrder.completedTime || '')}</p>
               </div>
 
               <div className="text-center mt-4">

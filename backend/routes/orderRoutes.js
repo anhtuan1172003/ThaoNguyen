@@ -21,6 +21,9 @@ router.post('/', checkLicenseKey, authenticateEmployee, orderController.createOr
 // Cập nhật đơn hàng (yêu cầu xác thực nhân viên)
 router.put('/:id', checkLicenseKey, authenticate, orderController.updateOrder);
 
+// Cập nhật trạng thái đơn hàng (cho cả admin và nhân viên)
+router.put('/:id/status', checkLicenseKey, authenticate, orderController.updateOrderStatus);
+
 // Lấy chi tiết đơn hàng theo ID (public route - đặt sau các route cụ thể)
 router.get('/:id', orderController.getOrderById);
 

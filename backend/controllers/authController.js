@@ -64,6 +64,11 @@ const employeeLogin = async (req, res) => {
       return res.status(401).json({ error: 'Tên đăng nhập không tồn tại' });
     }
 
+    // Kiểm tra trạng thái nhân viên
+    if (!employee.isActive) {
+      return res.status(403).json({ error: 'Tài khoản đã bị vô hiệu hóa' });
+    }
+
     // Kiểm tra mật khẩu
     if (!password || !employee.password) {
       return res.status(401).json({ error: 'Thiếu thông tin đăng nhập' });

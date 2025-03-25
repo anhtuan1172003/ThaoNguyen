@@ -12,8 +12,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import Products from './pages/Products';
 import Employees from './pages/Employees';
-import AdminOrders from './pages/admin/OrdersAdmin';
-import EmployeeOrders from './pages/employee/OrdersEmployee';
 import OrdersAdmin from './pages/admin/OrdersAdmin';
 import OrdersEmployee from './pages/employee/OrdersEmployee';
 import OrderDetail from './pages/OrderDetail';

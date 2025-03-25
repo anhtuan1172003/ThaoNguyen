@@ -1,21 +1,34 @@
 // API Configuration
-const API_BASE_URL = 'https://thaonguyen-full-stack.onrender.com';
+const API_BASE_URL = 'http://localhost:3001';
 
 export const API_ENDPOINTS = {
   // Auth endpoints
-  LOGIN: `${API_BASE_URL}/auth/login`,
-  ADMIN_LOGIN: `${API_BASE_URL}/auth/admin/login`,
+  LOGIN: `${API_BASE_URL}`,
 
   // Employee endpoints
-  EMPLOYEES: `${API_BASE_URL}/employees`,
-  EMPLOYEE: (id) => `${API_BASE_URL}/employees/${id}`,
+  GET_EMPLOYEE_PRODUCTS: `${API_BASE_URL}/products`,
+  CREATE_ORDER_BY_EMPLOYEE: `${API_BASE_URL}/orders`,
+  EDIT_ORDER_BY_EMPLOYEE: `${API_BASE_URL}/orders`,
+  EDIT_ORDER_STATUS_BY_EMPLOYEE: (id) => `${API_BASE_URL}/orders/${id}/status`,
+  GET_ORDERS_BY_EMPLOYEE: `${API_BASE_URL}/orders/employee`,
+
+  // Admin endpoints
+  GET_ADMIN_PRODUCTS: `${API_BASE_URL}/products`,
+  GET_EMPLOYEES_BY_ADMIN: `${API_BASE_URL}/employees`,
+  GET_ORDERS_BY_ADMIN: `${API_BASE_URL}/orders`,
+  EDIT_ORDER_STATUS_BY_ADMIN: (id) => `${API_BASE_URL}/orders/${id}/status`,
+  EDIT_ORDERS_BY_ADMIN: `${API_BASE_URL}/orders`,
+  CREATE_EMPLOYEE_BY_ADMIN: `${API_BASE_URL}/employees`,
+  UPDATE_EMPLOYEE: (id) => `${API_BASE_URL}/employees/${id}`,
+  UPDATE_EMPLOYEE_STATUS: (id) => `${API_BASE_URL}/employees/${id}/status`,
+  CREATE_ORDER_BY_ADMIN: `${API_BASE_URL}/orders/admin`,
+  
+  // Product endpoints
+  GET_PRODUCTS: `${API_BASE_URL}/products`,
+  EDIT_PRODUCT: (id) => `${API_BASE_URL}/products/${id}`,
+  CREATE_PRODUCTS: `${API_BASE_URL}/products`,
+  DELETE_PRODUCT: (id) => `${API_BASE_URL}/products/${id}`,
 
   // Order endpoints
-  ORDERS: `${API_BASE_URL}/orders`,
-  ORDER: (id) => `${API_BASE_URL}/orders/${id}`,
-  ORDERS_BY_EMPLOYEE: `${API_BASE_URL}/orders/employee`,
-  CREATE_ORDER_BY_ADMIN: `${API_BASE_URL}/orders/admin`,
-  // Product endpoints
-  PRODUCTS: `${API_BASE_URL}/products`,
-  PRODUCT: (id) => `${API_BASE_URL}/products/${id}`,
+  GET_ORDER_DETAIL: (id) => `${API_BASE_URL}/orders/${id}`,
 };

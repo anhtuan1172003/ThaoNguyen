@@ -13,6 +13,14 @@ const orderSchema = new mongoose.Schema({
   errorDescription: String,
   initialStatus: String,
   price: Number,
+  receiveTime: {
+    type: Date,
+    default: Date.now
+  },
+  completedTime: {
+    type: Date,
+    default: null
+  },
   orderStatus: {
     type: String,
     enum: ['not completed', 'completed'],

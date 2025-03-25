@@ -17,7 +17,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.PRODUCTS, {
+      const response = await axios.get(API_ENDPOINTS.GET_PRODUCTS, {
         headers: {
           'licenseKey': localStorage.getItem('licenseKey'),
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -52,9 +52,9 @@ const Products = () => {
       };
 
       if (editingProduct) {
-        await axios.put(API_ENDPOINTS.PRODUCT(editingProduct._id), formData, { headers });
+        await axios.put(API_ENDPOINTS.EDIT_PRODUCT(editingProduct._id), formData, { headers });
       } else {
-        await axios.post(API_ENDPOINTS.PRODUCTS, formData, { headers });
+        await axios.post(API_ENDPOINTS.CREATE_PRODUCTS, formData, { headers });
       }
 
       setShowModal(false);
@@ -80,7 +80,7 @@ const Products = () => {
   const handleDelete = async (productId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
       try {
-        await axios.delete(API_ENDPOINTS.PRODUCT(productId), {
+        await axios.delete(API_ENDPOINTS.DELETE_PRODUCT(productId), {
           headers: {
             'licenseKey': localStorage.getItem('licenseKey'),
             'Authorization': `Bearer ${localStorage.getItem('token')}`

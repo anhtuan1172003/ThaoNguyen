@@ -12,10 +12,13 @@ router.get('/', employeeController.getEmployees);
 // Thêm nhân viên mới (yêu cầu xác thực admin)
 router.post('/', authenticate, employeeController.addEmployee);
 
+// Cập nhật thông tin nhân viên (yêu cầu xác thực admin)
+router.put('/:id', authenticate, employeeController.updateEmployee);
+
 // Thêm công việc cho nhân viên
 router.post('/:id/tasks', employeeController.addTaskToEmployee);
 
-// Xoá nhân viên
-router.delete('/:id', employeeController.deleteEmployee);
+// Cập nhật trạng thái nhân viên
+router.patch('/:id/status', authenticate, employeeController.updateEmployeeStatus);
 
 module.exports = router;

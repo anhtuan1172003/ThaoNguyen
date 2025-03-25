@@ -3,7 +3,7 @@ import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Package, Users, ShoppingCart, QrCode } from 'lucide-react';
 import axios from 'axios';
 import QRScanner from '../../components/QRScanner';
-
+import { API_ENDPOINTS } from '../../config';
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     products: 0,
@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
       try {
         // Lấy số lượng sản phẩm
-        const productsResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/products', {
+        const productsResponse = await axios.get(`${API_ENDPOINTS.GET_ADMIN_PRODUCTS}`, {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         });
         
         // Lấy số lượng nhân viên
-        const employeesResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/employees', {
+        const employeesResponse = await axios.get(`${API_ENDPOINTS.GET_EMPLOYEES_BY_ADMIN}`, {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`
@@ -35,7 +35,7 @@ const AdminDashboard = () => {
         });
 
         // Lấy số lượng đơn hàng
-        const ordersResponse = await axios.get('https://thaonguyen-full-stack.onrender.com/orders', {
+        const ordersResponse = await axios.get(`${API_ENDPOINTS.GET_ORDERS_BY_ADMIN}`, {
           headers: {
             'licenseKey': licenseKey,
             'Authorization': `Bearer ${token}`

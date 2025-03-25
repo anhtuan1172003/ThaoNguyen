@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Card, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const Login = () => {
         ? { email: formData.email, password: formData.password }
         : { username: formData.username, password: formData.password };
 
-      const response = await axios.post(`https://thaonguyen-full-stack.onrender.com${endpoint}`, payload);
+      const response = await axios.post(`${API_ENDPOINTS.LOGIN}${endpoint}`, payload);
       
       // Lưu thông tin đăng nhập
       localStorage.setItem('token', response.data.token);
